@@ -1,0 +1,66 @@
+# -*- mode: ruby -*-
+# vi: set ft=ruby :
+
+required_plugins = %w( vagrant-host-shell )
+required_plugins.each do |plugin|
+  system "vagrant plugin install #{plugin}" unless Vagrant.has_plugin? plugin
+end
+
+VAGRANTFILE_API_VERSION = "2"
+MANAGERS = 1
+WORKERS = 2
+ANSIBLE_GROUPS = {
+  "managers" => ["manager[1:#{MANAGERS}]"],
+  "workers" => ["worker[1:#{WORKERS}]"],
+  "elk" => ["manager[1:1]"],
+  "influxdb" => ["manager[3:3]"],
+  "all_grups:children" => [
+    "managers",
+    "workers",
+    "elk",
+    "influxdb"]
+}
+
+Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
+  config.vm.box = "debian/strech64"
+  config.ssh.insert_key = false
+
+  config.vm.provider :virtualbox do |vb|
+    v.linked_clone = true if Vagrant::VERSION =~ /^1.8/
+  end
+
+  (1..MANAGERS).each do |manager_id|
+    config.vm.define "manager#{manager_id}" do |manager|
+      manager.vm.hostname = "manager#{manager_id}"
+      manager.vm.network "private_network", ip: "172.16.10.#{70+manager_id}"
+      manager.vm.provider "virtualbox" do |vb|
+        vb.memory = 1024
+        vb.cups = 1
+      end
+    end
+  end
+
+  (1..WORKERS).each do |worker_id|
+    config.vm.define "worker#{worker_id}" do |worker|
+      worker.vm.hostname = "worker#{worker_id}"
+      worker.vm.network "private_network", ip: "172.16.10.#{80+worker_id}"
+      worker.vm.provider "virtualbox" do |vb|
+        vb.memory = 1048
+        vb.cpus = 2
+      end
+      
+    if worker_id == WORKERS
+
+      worker.vm.provision "shell", type: "host_shell" do |sh|
+        sh.inline = "cd ansible && ansible-galaxy install -r requirements.yml -p roles --ignore-errors"
+      end
+
+      worker.vm.provision "swarm", type: "ansible" do |ansible|
+        ansible.limit = "all"
+        ansible.playbook = "ansible/swarm.yml"
+        ansible.verbose = "vv"
+        ansible.groups = ANSIBLE_GROUPS
+      end
+    end
+  end
+end

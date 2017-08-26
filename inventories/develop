@@ -1,0 +1,10 @@
+[docker]
+192.168.0.152
+192.168.0.153
+192.168.0.154
+
+[develop:children]
+docker
+
+[develop:vars]
+ansible_ssh_private_key_file=~/.ssh/id_rsa
