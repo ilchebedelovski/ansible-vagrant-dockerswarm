@@ -57,7 +57,7 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
 
       worker.vm.provision "swarm", type: "ansible" do |ansible|
         ansible.limit = "all"
-        ansible.playbook = "ansible/swarm.yml"
+        ansible.playbook = "playbooks/swarm.yml"
         ansible.verbose = "vv"
         ansible.groups = ANSIBLE_GROUPS
       end
