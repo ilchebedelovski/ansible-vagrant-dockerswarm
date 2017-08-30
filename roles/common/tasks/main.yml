@@ -1,3 +1,27 @@
-- name: setup Action User
-  user: generate_ssh_key=yes name={{ action_user }} password={{ action_user_pw | password_hash('sha512') }} shell=/bin/bash
-        
+---
+
+- name: Update all packages to the latest version
+  apt:
+    name: aptitude
+    update_cache: yes
+
+- name: Update apt
+  become: true
+  apt:
+    cache_valid_time: 3600
+    update_cache: yes
+    upgrade: yes
+
+- name: Install required packages
+  apt: name={{ item }} state=latest
+  with_items:
+    - netcat-traditional
+    - nmap
+    - htop
+    - sysstat
+    - python-pip
+    - bind9
+    - jq
+  tags:
+    - packages
+   

@@ -7,7 +7,7 @@ required_plugins.each do |plugin|
 end
 
 VAGRANTFILE_API_VERSION = "2"
-MANAGERS = 1
+MANAGERS = 2
 WORKERS = 2
 ANSIBLE_GROUPS = {
   "managers" => ["manager[1:#{MANAGERS}]"],
@@ -22,11 +22,11 @@ ANSIBLE_GROUPS = {
 }
 
 Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
-  config.vm.box = "debian/strech64"
+  config.vm.box = "debian/stretch64"
   config.ssh.insert_key = false
 
   config.vm.provider :virtualbox do |vb|
-    v.linked_clone = true if Vagrant::VERSION =~ /^1.8/
+    vb.linked_clone = true if Vagrant::VERSION =~ /^1.8/
   end
 
   (1..MANAGERS).each do |manager_id|
@@ -35,7 +35,7 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
       manager.vm.network "private_network", ip: "172.16.10.#{70+manager_id}"
       manager.vm.provider "virtualbox" do |vb|
         vb.memory = 1024
-        vb.cups = 1
+        vb.cpus = 1
       end
     end
   end
@@ -57,10 +57,11 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
 
       worker.vm.provision "swarm", type: "ansible" do |ansible|
         ansible.limit = "all"
-        ansible.playbook = "playbooks/swarm.yml"
+        ansible.playbook = "../playbooks/deploy-swarm.yml"
         ansible.verbose = "vv"
         ansible.groups = ANSIBLE_GROUPS
       end
+    end
     end
   end
 end
