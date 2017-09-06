@@ -7,7 +7,7 @@
     - { role: common, tags: common }
     - { role: docker, tags: docker }
   tasks:
-    - debug: var=docker_info.Swarm.LocalNodeState
+    - debug: var=docker_info.Swarm.LocalNodeState 
 
 - name: Configuring primary swarm manager
   hosts: managers[0]

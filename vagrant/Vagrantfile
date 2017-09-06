@@ -13,7 +13,7 @@ ANSIBLE_GROUPS = {
   "managers" => ["manager[1:#{MANAGERS}]"],
   "workers" => ["worker[1:#{WORKERS}]"],
   "elk" => ["manager[1:1]"],
-  "influxdb" => ["manager[3:3]"],
+  "influxdb" => ["manager[2:2]"],
   "all_grups:children" => [
     "managers",
     "workers",
@@ -58,7 +58,7 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
       worker.vm.provision "swarm", type: "ansible" do |ansible|
         ansible.limit = "all"
         ansible.playbook = "../playbooks/deploy-swarm.yml"
-        ansible.verbose = "vv"
+        ansible.verbose = "v"
         ansible.groups = ANSIBLE_GROUPS
       end
     end
