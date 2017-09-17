@@ -1,7 +1,10 @@
 ---
 
-vagrant_network_interface: enp0s8
+#vagrant_network_interface: "enp0s8"
+vagrant_network_interface: "eth1"
+vagrant_docker_interface: "docker0"
 vagrant_primary_manager_ip: "{{ hostvars['manager1']['ansible_'+vagrant_network_interface].ipv4.address }}"
+vagrant_primary_docker_ip: "{{ hostvars['manager1']['ansible_'+vagrant_docker_interface].ipv4.address }}"
 
 # Docker Swarm
 swarm_bind_port: 2377

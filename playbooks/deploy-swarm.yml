@@ -3,6 +3,13 @@
 - hosts: all
   become: yes
   become_user: root
+  tasks:
+    - name: Check docker IP
+      debug: msg={{ vagrant_primary_docker_ip }}
+
+- hosts: all
+  become: yes
+  become_user: root
   roles:
     - { role: common, tags: common }
     - { role: docker, tags: docker }
@@ -41,7 +48,7 @@
   tasks:
     - name: Starting secondary swarm manager
       shell: docker swarm join \
-               --token {{ hostvars['manager1']['manager_token'] }} \
+               --token {{ hostvars['manager1']['worker_token'] }} \
                {{ vagrant_primary_manager_ip }}:{{ swarm_bind_port }}
       register: init_result
       when: docker_info.Swarm.LocalNodeState != "active"
@@ -76,8 +83,8 @@
   become_user: root
   tasks:
     - name: Examine the swarm
-      no_log: true
-      shell: echo -e "GET /info HTTP/1.0\r\n" | nc -U /var/run/docker.sock | sed -n -e "/^{/p"| python -m json.tool
+      shell: >
+        curl http://{{ vagrant_primary_docker_ip }}:4243/info | python -m json.tool
       register: docker_swarm_result
 
     - set_fact:

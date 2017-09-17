@@ -22,7 +22,7 @@
 
 - name: Check the docker status
   shell: >
-    curl http://172.17.0.1:4243/info | python -m json.tool
+    curl http://{{ vagrant_primary_docker_ip }}:4243/info | python -m json.tool
   register: docker_status
 
 - set_fact:
