@@ -1,13 +1,13 @@
 ---
 
-- hosts: all
+- hosts: manager1
   become: yes
   become_user: root
-  tasks:
-    - name: Check docker IP
-      debug: msg={{ vagrant_primary_docker_ip }}
+  roles:
+    - { role: common, tags: common }
+    - { role: docker-manager, tags: docker }
 
-- hosts: all
+- hosts: manager2,worker1,worker2
   become: yes
   become_user: root
   roles:
@@ -84,7 +84,7 @@
   tasks:
     - name: Examine the swarm
       shell: >
-        curl http://{{ vagrant_primary_docker_ip }}:4243/info | python -m json.tool
+        curl -k https://{{ vagrant_primary_docker_ip }}:4243/info --cert /root/cert.pem --key /root/key.pem --cacert /root/ca.pem | python -m json.tool
       register: docker_swarm_result
 
     - set_fact:
