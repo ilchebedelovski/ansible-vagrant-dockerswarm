@@ -26,6 +26,16 @@
   args:
     chdir: /root
 
+- name: Download the client certificates
+  fetch:
+    src: /root/{{ item }}
+    dest: ../certificates/{{ item }}/
+  with_items:
+    - cert.pem
+    - key.pem
+    - ca.pem
+  flat: yes
+
 - name: Restart systemd daemon and stop docker if it is already started
   systemd:
     state: restarted

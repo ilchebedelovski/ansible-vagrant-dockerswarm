@@ -1,10 +1,25 @@
-# ansible-vagrant-dockerswarm
+# DockerSwarm on virtual nodes
 
 Setting up Docer Swarm cluster using Vagrant and Ansible
 
-Regurements
+## Getting Started
 
-python >= 2.6
-docker-compose >= 1.7.0
-Docker API >= 1.20
-PyYAML >= 3.11
+I will present instructions for deploying this project on your local machine.
+
+### Regurements
+
+The following software is required on your local machine before starting the cluster deployment:
+
+* python >= 2.7
+* docker >= 17.05
+* ansible >= 2.4
+* VBoxManage >= 5
+
+### Installing
+
+```
+cd vagrant
+vagrant up
+```
+
+
